@@ -1,0 +1,188 @@
+import 'package:capstone/categories/microscopy_screen.dart';
+import 'package:flutter/material.dart';
+import 'Microscopy_AT_Quiz_3_Items.dart' as quizItemsFile;
+import 'Microscopy_AT_Quiz_3_Results.dart';
+import 'package:provider/provider.dart';
+import 'package:capstone/globals/global_variables_notifier.dart';
+
+class Microscopy_AT_Quiz_3_Score extends StatefulWidget {
+  final int totalQuestions;
+  final int correctAnswers;
+  final List<quizItemsFile.QuizItemContent> quizItems;
+  final Map<int, String> userAnswers;
+
+  Microscopy_AT_Quiz_3_Score({
+    required this.totalQuestions,
+    required this.correctAnswers,
+    required this.quizItems,
+    required this.userAnswers,
+  });
+
+  @override
+  _Microscopy_AT_Quiz_3_ScoreState createState() =>
+      _Microscopy_AT_Quiz_3_ScoreState();
+}
+
+class _Microscopy_AT_Quiz_3_ScoreState extends State<Microscopy_AT_Quiz_3_Score> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final globalVariables = Provider.of<GlobalVariables>(context, listen: false);
+      debugPrint('incrementQuizTakeCount called in PostFrameCallback');
+      if (!globalVariables.quizTakenStatus.containsKey('quiz3') || !globalVariables.quizTakenStatus['quiz3']!) {
+        globalVariables.incrementQuizTakeCount('quiz3');
+      }
+      int finalCorrectAnswers = calculateCorrectAnswers();
+      globalVariables.setGlobalScore('quiz3', finalCorrectAnswers);
+      globalVariables.updateGlobalRemarks('quiz3', finalCorrectAnswers, widget.totalQuestions);
+      globalVariables.setQuizItemCount('quiz3', widget.totalQuestions);
+      globalVariables.printGlobalVariables();
+    });
+  }
+
+  String toCamelCase(String text) {
+    return text[0].toLowerCase() + text.substring(1);
+  }
+
+  int calculateCorrectAnswers() {
+    int correctCount = 0;
+    widget.userAnswers.forEach((questionIndex, userAnswer) {
+      var correctAnswers = widget.quizItems[questionIndex]
+          .answer
+          .split(RegExp(',|or|and'))
+          .map((s) => s.trim())
+          .toList();
+      if (correctAnswers.contains(userAnswer.toLowerCase()) ||
+          correctAnswers.contains(userAnswer.toUpperCase()) ||
+          correctAnswers.contains(userAnswer) ||
+          correctAnswers.contains(toCamelCase(userAnswer))) {
+        correctCount++;
+      }
+    });
+    return correctCount;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    int finalCorrectAnswers = calculateCorrectAnswers();
+    bool passed = (finalCorrectAnswers / widget.totalQuestions) >= 0.5;
+
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => MicroscopyScreen()),
+        );
+        return false;
+      },
+      child: Scaffold(
+        body: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              backgroundColor: Color.fromARGB(255, 125, 112, 101),
+              pinned: true,
+              expandedHeight: 120.0,
+              flexibleSpace: Padding(
+                padding: const EdgeInsets.only(
+                  top: 10,
+                  left: 50,
+                  right: 10,
+                  bottom: 16,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      'Microscopy',
+                      style: TextStyle(
+                        fontSize: 12.0,
+                        fontWeight: FontWeight.normal,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      'Assessment Task',
+                      style: TextStyle(
+                        fontSize: 12.0,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      'Quiz 1: ',
+                      style: TextStyle(
+                        fontSize: 12.0,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              leading: Padding(
+                padding: const EdgeInsets.only(
+                  top: 20,
+                ),
+                child: IconButton(
+                  icon: Icon(Icons.arrow_back_ios),
+                  color: Colors.white,
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => MicroscopyScreen(),
+                    ));
+                  },
+                ),
+              ),
+            ),
+            SliverFillRemaining(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Total Questions: ${widget.totalQuestions}',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      'Correct Answers: $finalCorrectAnswers',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    SizedBox(height: 20),
+                    Text(
+                      'You ${passed ? 'passed' : 'failed'} the quiz!',
+                      style: TextStyle(
+                        fontSize: 24,
+                        color: passed ? Colors.green : Colors.red,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Microscopy_AT_Quiz_3_Results(
+                              quizItems: widget.quizItems,
+                              userAnswers: widget.userAnswers,
+                            ),
+                          ),
+                        );
+                      },
+                      child: Text('Check Results'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
