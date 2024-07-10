@@ -1,0 +1,243 @@
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+class GlobalVariables extends ChangeNotifier {
+  Map<String, Map<String, dynamic>> userProgress = {
+    'lesson1': {
+      'isComplete': true,
+      'canTakeQuiz': false,
+      'quiz1Taken': false,
+      'quiz2Taken': false,
+      'quiz3Taken': false,
+      'topics': [
+        true,
+        false,
+        false, //topic2 = 2
+        false, //3
+        false,//4
+        false,//5
+        false,//6
+        false,//7
+      ]
+    },
+    'lesson2': {
+      'isComplete': false,
+      'canTakeQuiz': false,
+      'quiz1Taken': false,
+      'topics': [false, false, false, false, false, false]
+    },
+    'lesson3': {
+      'isComplete': false,
+      'canTakeQuiz': false,
+      'quizTaken': false,
+      'topics': [false, false, false, false, false, false, false, false]
+    },
+    'lesson4': {
+      'isComplete': false,
+      'canTakeQuiz': false,
+      'quizTaken': false,
+      'topics': [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    'lesson5': {
+      'isComplete': false,
+      'canTakeQuiz': false,
+      'quizTaken': false,
+      'topics': [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    'lesson6': {
+      'isComplete': false,
+      'canTakeQuiz': false,
+      'quizTaken': false,
+      'topics': [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+  };
+
+  Map<String, List<int>> globalScores = {};
+  Map<String, int> quizTakeCount = {};
+  Map<String, List<String>> globalRemarks = {};
+  Map<String, int> quizItemCount = {};
+  Map<String, List<DateTime>> quizTakenDates = {};
+  Map<String, bool> quizTakenStatus = {}; // New map to track if the quiz has been taken
+
+  void setGlobalScore(String quizKey, int score) {
+    if (globalScores.containsKey(quizKey)) {
+      globalScores[quizKey]?.add(score);
+    } else {
+      globalScores[quizKey] = [score];
+    }
+    notifyListeners();
+  }
+
+  void incrementQuizTakeCount(String quizKey) {
+    if (quizTakenStatus.containsKey(quizKey) && quizTakenStatus[quizKey]!) {
+      return; // If the quiz has already been taken, do not increment
+    }
+
+    debugPrint('incrementQuizTakeCount called for $quizKey');
+    if (quizTakeCount.containsKey(quizKey)) {
+      quizTakeCount[quizKey] = quizTakeCount[quizKey]! + 1;
+    } else {
+      quizTakeCount[quizKey] = 1;
+    }
+
+    quizTakenStatus[quizKey] = true; // Mark the quiz as taken
+
+    setQuizTakenDate(quizKey);
+    notifyListeners();
+    debugPrint('Quiz take count for $quizKey is now ${quizTakeCount[quizKey]}');
+  }
+
+  void resetQuizTakenStatus(String quizKey) {
+    quizTakenStatus[quizKey] = false;
+    notifyListeners();
+  }
+
+  void updateGlobalRemarks(String quizKey, int correctAnswers, int totalQuestions) {
+    String remarks;
+    if ((correctAnswers / totalQuestions) >= 0.5) {
+      remarks = 'Passed';
+    } else {
+      remarks = 'Failed';
+    }
+    if (globalRemarks.containsKey(quizKey)) {
+      globalRemarks[quizKey]?.add(remarks);
+    } else {
+      globalRemarks[quizKey] = [remarks];
+    }
+    notifyListeners();
+  }
+
+  void setQuizItemCount(String quizKey, int itemCount) {
+    quizItemCount[quizKey] = itemCount;
+    notifyListeners();
+  }
+
+  void setQuizTakenDate(String quizKey) {
+    if (quizTakenDates.containsKey(quizKey)) {
+      quizTakenDates[quizKey]?.add(DateTime.now());
+    } else {
+      quizTakenDates[quizKey] = [DateTime.now()];
+    }
+    notifyListeners();
+  }
+
+  void completeLesson(String lessonId) {
+    userProgress[lessonId]?['isComplete'] = true;
+    notifyListeners();
+  }
+
+  bool isLessonComplete(String lessonId) {
+    return userProgress[lessonId]?['isComplete'] ?? false;
+  }
+
+  void unlockNextLesson(String completedLessonId) {
+    int completedLessonNumber = int.parse(completedLessonId.replaceAll(RegExp(r'\D'), ''));
+    String nextLessonId = 'lesson' + (completedLessonNumber + 1).toString();
+    if (userProgress.containsKey(nextLessonId)) {
+      userProgress[nextLessonId]?['canTakeQuiz'] = true;
+    }
+    notifyListeners();
+  }
+
+  void allowQuiz(String lessonId) {
+    userProgress[lessonId]?['canTakeQuiz'] = true;
+  }
+
+  void setQuizTaken(String lessonId, int quizNumber, bool value) {
+    String quizKey = '${lessonId}_quiz${quizNumber}Taken';  // Updated key
+    userProgress[lessonId]?[quizKey] = value;
+    if (value) {
+      unlockNextLesson(lessonId);
+    }
+    notifyListeners();
+  }
+
+  bool getQuizTaken(String lessonId, int quizNumber) {
+    String quizKey = '${lessonId}_quiz${quizNumber}Taken';  // Updated key
+    return userProgress[lessonId]?[quizKey] ?? false;
+  }
+
+  bool canTakeQuiz(String lessonId) {
+    return userProgress[lessonId]?['canTakeQuiz'] ?? false;
+  }
+
+  List<bool> getTopics(String lessonId) {
+    return userProgress[lessonId]?['topics'];
+  }
+
+  void setTopic(String lessonId, int index, bool value) {
+    userProgress[lessonId]?['topics'][index] = value;
+    notifyListeners();
+  }
+
+  void printGlobalVariables() {
+    debugPrint('Global Variable Scores: $globalScores');
+    debugPrint('Global Variable Quiz Take Count: $quizTakeCount');
+    debugPrint('Global Variable Remarks: $globalRemarks');
+    debugPrint('Global Variable Quiz Item Count: $quizItemCount');
+    debugPrint('Global Variable Quiz Taken Dates: $quizTakenDates');
+    debugPrint('Global Variable Quiz Taken Status: $quizTakenStatus');
+  }
+
+  Future<void> _saveToPrefs(String key, dynamic value) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (value is Map) {
+      value = jsonEncode(value);
+    }
+    await prefs.setString(key, value);
+  }
+
+  Future<void> loadFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    userProgress = (jsonDecode(prefs.getString('userProgress') ?? '{}')
+    as Map<String, dynamic>)
+        .map((key, value) => MapEntry(key, Map<String, dynamic>.from(value)));
+    globalScores = jsonDecode(prefs.getString('globalScores') ?? '{}');
+    quizTakeCount = jsonDecode(prefs.getString('quizTakeCount') ?? '{}');
+    globalRemarks = jsonDecode(prefs.getString('globalRemarks') ?? '{}');
+    quizItemCount = jsonDecode(prefs.getString('quizItemCount') ?? '{}');
+    quizTakenDates = jsonDecode(prefs.getString('quizTakenDates') ?? '{}');
+    quizTakenStatus = jsonDecode(prefs.getString('quizTakenStatus') ?? '{}');
+    notifyListeners();
+  }
+}
