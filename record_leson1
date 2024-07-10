@@ -1,0 +1,68 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:capstone/globals/global_variables_notifier.dart';
+import 'package:capstone/components/graph_card.dart';
+import 'package:capstone/components/graph_details_screen.dart';
+class RecordLesson1 extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var globalVariables = Provider.of<GlobalVariables>(context);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Lesson 1 Record'),
+        backgroundColor: Color(0xFFFFA551),
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Text(
+                'Quiz Results Overview',
+                style: TextStyle(
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+            _buildGraphCard(context, 'AT 1.1', 'lesson1', 'quiz1'),
+            SizedBox(height: 20),
+            _buildGraphCard(context, 'AT 1.2', 'lesson1', 'quiz2'),
+            SizedBox(height: 20),
+            _buildGraphCard(context, 'AT 1.3', 'lesson1', 'quiz3'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGraphCard(BuildContext context, String title, String lessonId, String quizId) {
+    var globalVariables = Provider.of<GlobalVariables>(context);
+
+    return GraphCard(
+      title: title,
+      takeCount: globalVariables.quizTakeCount[quizId] ?? 0,
+      itemCount: globalVariables.quizItemCount[quizId] ?? 0,
+      scores: globalVariables.globalScores[quizId] ?? [],
+      remarks: globalVariables.globalRemarks[quizId] ?? [],
+      onDetailsPressed: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => GraphDetailScreen(
+              title: title,
+              takeCount: globalVariables.quizTakeCount[quizId] ?? 0,
+              itemCount: globalVariables.quizItemCount[quizId] ?? 0,
+              scores: globalVariables.globalScores[quizId] ?? [],
+              remarks: globalVariables.globalRemarks[quizId] ?? [],
+              dateTaken: globalVariables.quizTakenDates[quizId] ?? [],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
