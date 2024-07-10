@@ -1,0 +1,248 @@
+import 'package:flutter/material.dart';
+import 'Microscopy_AT_Quiz_1_Score.dart';
+import 'Microscopy_AT_Quiz_1_Items.dart';
+import 'package:provider/provider.dart';
+import 'package:capstone/globals/global_variables_notifier.dart';
+import 'package:photo_view/photo_view.dart';
+
+class Microscopy_AT_Quiz_1_Content extends StatefulWidget {
+  @override
+  _Microscopy_AT_Quiz_1_ContentState createState() => _Microscopy_AT_Quiz_1_ContentState();
+}
+
+class _Microscopy_AT_Quiz_1_ContentState extends State<Microscopy_AT_Quiz_1_Content> {
+  List<QuizItemContent> generateQuizItems() {
+    return [
+      QuizItemContent(question: 'hint: EPL', answer: 'eye piece lens'),
+      QuizItemContent(question: 'hint: DA', answer: 'diopter adjustment'),
+      QuizItemContent(question: 'hint: NP', answer: 'nose piece'),
+      QuizItemContent(question: 'hint: OL', answer: 'objective lenses'),
+      QuizItemContent(question: 'hint: SC', answer: 'stage clip'),
+      QuizItemContent(question: 'hint: A', answer: 'aperture'),
+      QuizItemContent(question: 'hint: D', answer: 'diaphragm'),
+      QuizItemContent(question: 'hint: C', answer: 'condenser'),
+      QuizItemContent(question: 'hint: LS', answer: 'light source'),
+      QuizItemContent(question: 'hint: EPT', answer: 'eye piece tube'),
+      QuizItemContent(question: 'hint: H', answer: 'head'),
+      QuizItemContent(question: 'hint: A', answer: 'arm'),
+      QuizItemContent(question: 'hint: GS', answer: 'glass slide'),
+      QuizItemContent(question: 'hint: MS', answer: 'mechanical stage'),
+      QuizItemContent(question: 'hint: CAK', answer: 'coarse adjustment knob'),
+      QuizItemContent(question: 'hint: FAK', answer: 'fine adjustment knob'),
+      QuizItemContent(question: 'hint: SCK', answer: 'stage control knobs'),
+      QuizItemContent(question: 'hint: B', answer: 'base'),
+      QuizItemContent(question: 'hint: BA', answer: 'brightness adjustment'),
+      QuizItemContent(question: 'hint: LS', answer: 'light switch'),
+    ];
+  }
+
+  final TextEditingController answerController = TextEditingController();
+  Map<int, String> userAnswers = {};
+  bool isAnswerEmpty = true;
+
+  @override
+  void dispose() {
+    answerController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final quizItems = generateQuizItems();
+    final String quizKey = 'quiz1';  // Define quizKey for clarity
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Microscopy Assessment Task Quiz'),
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: EdgeInsets.symmetric(vertical: 8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    'Instructions:',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 8.0),
+                  RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(
+                      style: TextStyle(
+                        fontSize: 14.0,
+                        color: Colors.black,
+                      ),
+                      children: [
+                        TextSpan(
+                          text: 'Label each part of the microscope based on the number. Write your answer below. Make sure the answer is in ',
+                        ),
+                        TextSpan(
+                          text: 'lowercase',
+                          style: TextStyle(
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                        TextSpan(
+                          text: '. There is a hint for each number to assist you. Good luck!',
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 50.0),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Scaffold(
+                            appBar: AppBar(
+                              title: Text('Zoom Image'),
+                            ),
+                            body: Center(
+                              child: PhotoView(
+                                imageProvider: AssetImage('assets/images/Microscopy/Answer.png'),
+                                minScale: PhotoViewComputedScale.contained,
+                                maxScale: PhotoViewComputedScale.covered * 2,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      child: Center(
+                        child: Image.asset(
+                          'assets/images/Microscopy/Answer.png',
+                          width: double.infinity,
+                          height: 200,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10.0),
+                  Text(
+                    'Note: click the image to view it clearly. You can zoom in and out.',
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 20.0),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: quizItems.length,
+              itemBuilder: (context, index) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Question ${index + 1}',
+                      style: TextStyle(fontSize: 14.0, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 12.0),
+                    Text(
+                      quizItems[index].question,
+                      style: TextStyle(fontSize: 12.0),
+                    ),
+                    SizedBox(height: 12.0),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 16.0),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: TextField(
+                        onChanged: (answer) {
+                          setState(() {
+                            userAnswers[index] = answer.toLowerCase();
+                            isAnswerEmpty = answer.isEmpty;
+                          });
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Enter your answer',
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(vertical: 12.0),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20.0),
+                  ],
+                );
+              },
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (userAnswers.length < quizItems.length) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Please answer all questions.')),
+                  );
+                  return;
+                }
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('Submit Quiz'),
+                      content: Text('Are you sure you want to submit?'),
+                      actions: <Widget>[
+                        TextButton(
+                          child: Text('No'),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        TextButton(
+                          child: Text('Yes'),
+                          onPressed: () {
+                            final globalVariables = Provider.of<GlobalVariables>(context, listen: false);
+                            globalVariables.setQuizTaken('lesson1', 1, true); // Update quiz taken status
+
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Microscopy_AT_Quiz_1_Score(
+                                  totalQuestions: quizItems.length,
+                                  correctAnswers: calculateCorrectAnswers(),
+                                  quizItems: quizItems,
+                                  userAnswers: userAnswers,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              child: Text('Submit'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  int calculateCorrectAnswers() {
+    int correctCount = 0;
+    List<QuizItemContent> quizItems = generateQuizItems();
+    for (int i = 0; i < quizItems.length; i++) {
+      String userAnswer = userAnswers[i] ?? '';
+      List<String> correctAnswers = quizItems[i].answer.split('/');
+      bool isCorrect = correctAnswers.any((answer) => userAnswer.toLowerCase() == answer.trim().toLowerCase());
+      if (isCorrect) {
+        correctCount++;
+      }
+    }
+    return correctCount;
+  }
+}
