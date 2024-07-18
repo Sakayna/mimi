@@ -32,8 +32,10 @@ class _ModuleScreenPage extends State<ModuleScreen> {
   bool modelPlaced = false;
   bool showPlanes = true;
   bool showQuestion = false;
-  bool showBaseDiscussion = false;
+  bool showSuccessMessage = false;
+  bool showNewModel = false;
   bool showFineFocusQuestion = false;
+  bool showBaseDiscussion = false;
   bool showFineFocusDiscussion = false;
   bool showCoarseFocusQuestion = false;
   bool showCoarseFocusDiscussion = false;
@@ -51,7 +53,6 @@ class _ModuleScreenPage extends State<ModuleScreen> {
   bool showObjectiveDiscussion = false;
   bool showNosepieceQuestion = false;
   bool showNosepieceDiscussion = false;
-
   int baseDiscussionStep = 0;
   int fineFocusDiscussionStep = 0;
   int coarseFocusDiscussionStep = 0;
@@ -62,7 +63,6 @@ class _ModuleScreenPage extends State<ModuleScreen> {
   int stageDiscussionStep = 0;
   int objectiveDiscussionStep = 0;
   int nosepieceDiscussionStep = 0;
-
   int wrongAnswers = 0;
   int correctAnswers = 0;
   ARNode? placedNode;
@@ -110,20 +110,14 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                       children: [
                         Icon(Icons.camera, size: 100, color: Colors.white),
                         SizedBox(height: 20),
-                        Container(
-                          padding: EdgeInsets.all(16.0),
-                          decoration: BoxDecoration(
-                            color: Colors.black54,
-                            borderRadius: BorderRadius.circular(8.0),
+                        Text(
+                          'Scan the surface and tap to start',
+                          style: TextStyle(
+                            fontSize: 24,
+                            color: Colors.white,
+                            backgroundColor: Colors.black54,
                           ),
-                          child: Text(
-                            'Scan the surface and tap to start',
-                            style: TextStyle(
-                              fontSize: 24,
-                              color: Colors.white,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
+                          textAlign: TextAlign.center,
                         ),
                       ],
                     ),
@@ -132,20 +126,14 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                       children: [
                         Icon(Icons.touch_app, size: 100, color: Colors.white),
                         SizedBox(height: 20),
-                        Container(
-                          padding: EdgeInsets.all(16.0),
-                          decoration: BoxDecoration(
-                            color: Colors.black54,
-                            borderRadius: BorderRadius.circular(8.0),
+                        Text(
+                          'Tap the screen to place the model',
+                          style: TextStyle(
+                            fontSize: 24,
+                            color: Colors.white,
+                            backgroundColor: Colors.black54,
                           ),
-                          child: Text(
-                            'Tap the screen to place the model',
-                            style: TextStyle(
-                              fontSize: 24,
-                              color: Colors.white,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
+                          textAlign: TextAlign.center,
                         ),
                       ],
                     ),
@@ -154,15 +142,22 @@ class _ModuleScreenPage extends State<ModuleScreen> {
             ),
           if (modelPlaced &&
               !showQuestion &&
+              !showNewModel &&
+              !showFineFocusQuestion &&
               !showBaseDiscussion &&
-              !showFineFocusDiscussion &&
               !showCoarseFocusDiscussion &&
-              !showArmDiscussion &&
+              !showCoarseFocusQuestion &&
+              !showArmQuestion &&
               !showEyepieceDiscussion &&
-              !showIlluminatorDiscussion &&
+              !showEyepieceQuestion &&
+              !showIlluminatorQuestion &&
+              !showDiaphragmQuestion &&
               !showDiaphragmDiscussion &&
+              !showStageQuestion &&
               !showStageDiscussion &&
+              !showObjectiveQuestion &&
               !showObjectiveDiscussion &&
+              !showNosepieceQuestion &&
               !showNosepieceDiscussion)
             Positioned(
               bottom: 100,
@@ -170,20 +165,14 @@ class _ModuleScreenPage extends State<ModuleScreen> {
               right: 0,
               child: Column(
                 children: [
-                  Container(
-                    padding: EdgeInsets.all(16.0),
-                    decoration: BoxDecoration(
-                      color: Colors.black54,
-                      borderRadius: BorderRadius.circular(8.0),
+                  Text(
+                    "Here is the model!",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                      backgroundColor: Colors.black54,
                     ),
-                    child: Text(
-                      "Here is the model!",
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                    textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 20),
                   ElevatedButton(
@@ -204,20 +193,14 @@ class _ModuleScreenPage extends State<ModuleScreen> {
               right: 0,
               child: Column(
                 children: [
-                  Container(
-                    padding: EdgeInsets.all(16.0),
-                    decoration: BoxDecoration(
-                      color: Colors.black54,
-                      borderRadius: BorderRadius.circular(8.0),
+                  Text(
+                    "But first, can you answer this question?\nWhat part of the microscope is used to support it?",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                      backgroundColor: Colors.black54,
                     ),
-                    child: Text(
-                      "But first, can you answer this question?\nWhat part of the microscope is used to support it?",
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                    textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 20),
                   ElevatedButton(
@@ -233,6 +216,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                       setState(() {
                         correctAnswers += 1;
                         showQuestion = false;
+                        showNewModel = true;
                         showBaseDiscussion = true;
                         unlockedButtons[0] = true; // Unlock the first button
                       });
@@ -246,14 +230,6 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                       });
                     },
                     child: Text('Stage'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        wrongAnswers += 1;
-                      });
-                    },
-                    child: Text('Objective Lens'),
                   ),
                 ],
               ),
@@ -319,7 +295,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                       Column(
                         children: [
                           Text(
-                            "The base often contains the light source and other electronic components.",
+                            "Make sure the base is clean and free from dust to maintain a clear view through the lenses.",
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.white,
@@ -350,20 +326,14 @@ class _ModuleScreenPage extends State<ModuleScreen> {
               right: 0,
               child: Column(
                 children: [
-                  Container(
-                    padding: EdgeInsets.all(16.0),
-                    decoration: BoxDecoration(
-                      color: Colors.black54,
-                      borderRadius: BorderRadius.circular(8.0),
+                  Text(
+                    "Can you answer this question?\nWhich part of the microscope is used for fine focusing?",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                      backgroundColor: Colors.black54,
                     ),
-                    child: Text(
-                      "Can you answer this question?\nWhich part of the microscope is the fine focus?",
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                    textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 20),
                   ElevatedButton(
@@ -372,7 +342,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                         wrongAnswers += 1;
                       });
                     },
-                    child: Text('Base'),
+                    child: Text('Coarse Focus'),
                   ),
                   ElevatedButton(
                     onPressed: () {
@@ -391,19 +361,13 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                         wrongAnswers += 1;
                       });
                     },
-                    child: Text('Stage'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        wrongAnswers += 1;
-                      });
-                    },
-                    child: Text('Objective Lens'),
+                    child: Text('Eyepiece'),
                   ),
                 ],
               ),
             ),
+
+// Code for the fine focus discussion
           if (showFineFocusDiscussion)
             Positioned(
               bottom: 150, // Adjusted to move above the buttons
@@ -421,7 +385,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                       Column(
                         children: [
                           Text(
-                            "The fine focus knob is used to bring the specimen into sharp focus under low power.",
+                            "The fine focus knob is used for precise focusing once the coarse focus has been used.",
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.white,
@@ -443,7 +407,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                       Column(
                         children: [
                           Text(
-                            "It is used to fine-tune the focus of the specimen after using the coarse focus.",
+                            "It allows for slight movement of the stage to sharpen the focus of the specimen.",
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.white,
@@ -465,7 +429,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                       Column(
                         children: [
                           Text(
-                            "The fine focus knob is typically smaller and located inside the coarse focus knob.",
+                            "Use the fine focus knob with high power objectives to avoid damaging the slides.",
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.white,
@@ -489,6 +453,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                 ),
               ),
             ),
+          // Code for the coarse focus question
           if (showCoarseFocusQuestion)
             Positioned(
               bottom: 100,
@@ -496,20 +461,14 @@ class _ModuleScreenPage extends State<ModuleScreen> {
               right: 0,
               child: Column(
                 children: [
-                  Container(
-                    padding: EdgeInsets.all(16.0),
-                    decoration: BoxDecoration(
-                      color: Colors.black54,
-                      borderRadius: BorderRadius.circular(8.0),
+                  Text(
+                    "Can you answer this question?\nWhich part of the microscope is used for coarse focusing?",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                      backgroundColor: Colors.black54,
                     ),
-                    child: Text(
-                      "Can you answer this question?\nWhich part of the microscope is the coarse focus?",
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                    textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 20),
                   ElevatedButton(
@@ -518,7 +477,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                         wrongAnswers += 1;
                       });
                     },
-                    child: Text('Illuminator'),
+                    child: Text('Fine Focus'),
                   ),
                   ElevatedButton(
                     onPressed: () {
@@ -537,19 +496,13 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                         wrongAnswers += 1;
                       });
                     },
-                    child: Text('Eyepiece'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        wrongAnswers += 1;
-                      });
-                    },
-                    child: Text('Fine Focus'),
+                    child: Text('Stage'),
                   ),
                 ],
               ),
             ),
+
+// Code for the coarse focus discussion
           if (showCoarseFocusDiscussion)
             Positioned(
               bottom: 150, // Adjusted to move above the buttons
@@ -567,7 +520,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                       Column(
                         children: [
                           Text(
-                            "The coarse focus knob is used to move the objective lenses toward or away from the specimen.",
+                            "The coarse focus knob is used to bring the specimen into general focus.",
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.white,
@@ -589,7 +542,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                       Column(
                         children: [
                           Text(
-                            "It is typically larger than the fine focus knob.",
+                            "It moves the stage up and down to help you get the specimen in focus.",
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.white,
@@ -611,7 +564,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                       Column(
                         children: [
                           Text(
-                            "The coarse focus knob is used to quickly bring the specimen into general focus.",
+                            "Use the coarse focus knob only with low power objectives to prevent damage to the slides.",
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.white,
@@ -635,6 +588,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                 ),
               ),
             ),
+          // Code for the arm question
           if (showArmQuestion)
             Positioned(
               bottom: 100,
@@ -642,20 +596,14 @@ class _ModuleScreenPage extends State<ModuleScreen> {
               right: 0,
               child: Column(
                 children: [
-                  Container(
-                    padding: EdgeInsets.all(16.0),
-                    decoration: BoxDecoration(
-                      color: Colors.black54,
-                      borderRadius: BorderRadius.circular(8.0),
+                  Text(
+                    "Can you answer this question?\nWhich part of the microscope is known as the arm?",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                      backgroundColor: Colors.black54,
                     ),
-                    child: Text(
-                      "Can you answer this question?\nWhich part of the microscope is the arm?",
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                    textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 20),
                   ElevatedButton(
@@ -664,7 +612,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                         wrongAnswers += 1;
                       });
                     },
-                    child: Text('Stage'),
+                    child: Text('Base'),
                   ),
                   ElevatedButton(
                     onPressed: () {
@@ -683,19 +631,13 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                         wrongAnswers += 1;
                       });
                     },
-                    child: Text('Illuminator'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        wrongAnswers += 1;
-                      });
-                    },
                     child: Text('Eyepiece'),
                   ),
                 ],
               ),
             ),
+
+// Code for the arm discussion
           if (showArmDiscussion)
             Positioned(
               bottom: 150, // Adjusted to move above the buttons
@@ -713,7 +655,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                       Column(
                         children: [
                           Text(
-                            "The arm supports the tube and connects it to the base.",
+                            "The arm of the microscope connects the base to the head and provides support for the optical components.",
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.white,
@@ -735,7 +677,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                       Column(
                         children: [
                           Text(
-                            "It is used to carry the microscope.",
+                            "It is important to hold the arm when carrying the microscope to ensure stability and avoid damage.",
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.white,
@@ -757,7 +699,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                       Column(
                         children: [
                           Text(
-                            "The arm is usually one of the sturdiest parts of the microscope.",
+                            "The arm also supports the stage and adjustment knobs, making it a crucial part of the microscope's structure.",
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.white,
@@ -781,6 +723,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                 ),
               ),
             ),
+          // Code for the eyepiece question
           if (showEyepieceQuestion)
             Positioned(
               bottom: 100,
@@ -788,20 +731,14 @@ class _ModuleScreenPage extends State<ModuleScreen> {
               right: 0,
               child: Column(
                 children: [
-                  Container(
-                    padding: EdgeInsets.all(16.0),
-                    decoration: BoxDecoration(
-                      color: Colors.black54,
-                      borderRadius: BorderRadius.circular(8.0),
+                  Text(
+                    "Can you answer this question?\nWhich part of the microscope is the eyepiece?",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                      backgroundColor: Colors.black54,
                     ),
-                    child: Text(
-                      "Can you answer this question?\nWhich part of the microscope is the eyepiece?",
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                    textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 20),
                   ElevatedButton(
@@ -810,7 +747,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                         wrongAnswers += 1;
                       });
                     },
-                    child: Text('Fine Focus'),
+                    child: Text('Objective Lens'),
                   ),
                   ElevatedButton(
                     onPressed: () {
@@ -829,19 +766,13 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                         wrongAnswers += 1;
                       });
                     },
-                    child: Text('Coarse Focus'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        wrongAnswers += 1;
-                      });
-                    },
                     child: Text('Stage'),
                   ),
                 ],
               ),
             ),
+
+// Code for the eyepiece discussion
           if (showEyepieceDiscussion)
             Positioned(
               bottom: 150, // Adjusted to move above the buttons
@@ -859,7 +790,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                       Column(
                         children: [
                           Text(
-                            "The eyepiece, or ocular lens, is the lens at the top that you look through.",
+                            "The eyepiece is the part of the microscope where you place your eye to observe the specimen.",
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.white,
@@ -881,7 +812,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                       Column(
                         children: [
                           Text(
-                            "They are usually 10x or 15x power.",
+                            "It contains a lens that magnifies the image of the specimen.",
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.white,
@@ -903,7 +834,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                       Column(
                         children: [
                           Text(
-                            "The eyepiece tube holds the eyepieces in place above the objective lens.",
+                            "The eyepiece tube holds the eyepiece in place.",
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.white,
@@ -927,6 +858,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                 ),
               ),
             ),
+          // Code for the illuminator question
           if (showIlluminatorQuestion)
             Positioned(
               bottom: 100,
@@ -934,20 +866,14 @@ class _ModuleScreenPage extends State<ModuleScreen> {
               right: 0,
               child: Column(
                 children: [
-                  Container(
-                    padding: EdgeInsets.all(16.0),
-                    decoration: BoxDecoration(
-                      color: Colors.black54,
-                      borderRadius: BorderRadius.circular(8.0),
+                  Text(
+                    "Can you answer this question?\nWhich part of the microscope is the illuminator?",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                      backgroundColor: Colors.black54,
                     ),
-                    child: Text(
-                      "Can you answer this question?\nWhich part of the microscope is the illuminator?",
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                    textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 20),
                   ElevatedButton(
@@ -956,7 +882,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                         wrongAnswers += 1;
                       });
                     },
-                    child: Text('Eyepiece'),
+                    child: Text('Base'),
                   ),
                   ElevatedButton(
                     onPressed: () {
@@ -975,19 +901,13 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                         wrongAnswers += 1;
                       });
                     },
-                    child: Text('Stage'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        wrongAnswers += 1;
-                      });
-                    },
-                    child: Text('Nosepiece'),
+                    child: Text('Coarse Focus'),
                   ),
                 ],
               ),
             ),
+
+// Code for the illuminator discussion
           if (showIlluminatorDiscussion)
             Positioned(
               bottom: 150, // Adjusted to move above the buttons
@@ -1027,7 +947,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                       Column(
                         children: [
                           Text(
-                            "It focuses light on the specimen, providing bright, even illumination.",
+                            "It projects light upwards through the diaphragm, the specimen, and the lenses.",
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.white,
@@ -1049,7 +969,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                       Column(
                         children: [
                           Text(
-                            "Modern microscopes use LED lights for longer life and consistent color temperature.",
+                            "Adjusting the illuminator's intensity can improve the visibility and contrast of the specimen.",
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.white,
@@ -1073,6 +993,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                 ),
               ),
             ),
+          // Code for the diaphragm question
           if (showDiaphragmQuestion)
             Positioned(
               bottom: 100,
@@ -1080,20 +1001,14 @@ class _ModuleScreenPage extends State<ModuleScreen> {
               right: 0,
               child: Column(
                 children: [
-                  Container(
-                    padding: EdgeInsets.all(16.0),
-                    decoration: BoxDecoration(
-                      color: Colors.black54,
-                      borderRadius: BorderRadius.circular(8.0),
+                  Text(
+                    "Can you answer this question?\nWhich part of the microscope is the diaphragm?",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                      backgroundColor: Colors.black54,
                     ),
-                    child: Text(
-                      "Can you answer this question?\nWhich part of the microscope is the diaphragm?",
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                    textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 20),
                   ElevatedButton(
@@ -1102,7 +1017,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                         wrongAnswers += 1;
                       });
                     },
-                    child: Text('Eyepiece'),
+                    child: Text('Illuminator'),
                   ),
                   ElevatedButton(
                     onPressed: () {
@@ -1121,19 +1036,13 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                         wrongAnswers += 1;
                       });
                     },
-                    child: Text('Illuminator'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        wrongAnswers += 1;
-                      });
-                    },
-                    child: Text('Fine Focus'),
+                    child: Text('Eyepiece'),
                   ),
                 ],
               ),
             ),
+
+// Code for the diaphragm discussion
           if (showDiaphragmDiscussion)
             Positioned(
               bottom: 150, // Adjusted to move above the buttons
@@ -1151,7 +1060,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                       Column(
                         children: [
                           Text(
-                            "The diaphragm controls the amount of light reaching the specimen.",
+                            "The diaphragm is used to vary the intensity and size of the cone of light projected.",
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.white,
@@ -1173,7 +1082,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                       Column(
                         children: [
                           Text(
-                            "It can be adjusted to improve contrast and resolution.",
+                            "It is located under the stage, just above the light source.",
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.white,
@@ -1195,7 +1104,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                       Column(
                         children: [
                           Text(
-                            "The diaphragm is typically located under the stage.",
+                            "Adjusting the diaphragm helps improve contrast and detail in the image.",
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.white,
@@ -1219,6 +1128,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                 ),
               ),
             ),
+          // Code for the stage question
           if (showStageQuestion)
             Positioned(
               bottom: 100,
@@ -1226,20 +1136,14 @@ class _ModuleScreenPage extends State<ModuleScreen> {
               right: 0,
               child: Column(
                 children: [
-                  Container(
-                    padding: EdgeInsets.all(16.0),
-                    decoration: BoxDecoration(
-                      color: Colors.black54,
-                      borderRadius: BorderRadius.circular(8.0),
+                  Text(
+                    "Can you answer this question?\nWhich part of the microscope is the stage?",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                      backgroundColor: Colors.black54,
                     ),
-                    child: Text(
-                      "Can you answer this question?\nWhich part of the microscope is the stage?",
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                    textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 20),
                   ElevatedButton(
@@ -1248,7 +1152,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                         wrongAnswers += 1;
                       });
                     },
-                    child: Text('Diaphragm'),
+                    child: Text('Objective Lens'),
                   ),
                   ElevatedButton(
                     onPressed: () {
@@ -1267,19 +1171,13 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                         wrongAnswers += 1;
                       });
                     },
-                    child: Text('Illuminator'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        wrongAnswers += 1;
-                      });
-                    },
                     child: Text('Eyepiece'),
                   ),
                 ],
               ),
             ),
+
+// Code for the stage discussion
           if (showStageDiscussion)
             Positioned(
               bottom: 150, // Adjusted to move above the buttons
@@ -1297,7 +1195,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                       Column(
                         children: [
                           Text(
-                            "The stage is where the specimen is placed for viewing.",
+                            "The stage is the flat platform where you place your slides.",
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.white,
@@ -1341,7 +1239,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                       Column(
                         children: [
                           Text(
-                            "Mechanical stages can be moved precisely in small increments.",
+                            "You can move the stage left, right, forward, and backward to view different areas of the slide.",
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.white,
@@ -1365,6 +1263,8 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                 ),
               ),
             ),
+
+// Code for the objective lenses question
           if (showObjectiveQuestion)
             Positioned(
               bottom: 100,
@@ -1372,20 +1272,14 @@ class _ModuleScreenPage extends State<ModuleScreen> {
               right: 0,
               child: Column(
                 children: [
-                  Container(
-                    padding: EdgeInsets.all(16.0),
-                    decoration: BoxDecoration(
-                      color: Colors.black54,
-                      borderRadius: BorderRadius.circular(8.0),
+                  Text(
+                    "Can you answer this question?\nWhich part of the microscope is the objective lens?",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                      backgroundColor: Colors.black54,
                     ),
-                    child: Text(
-                      "Can you answer this question?\nWhich part of the microscope is the objective lens?",
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                    textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 20),
                   ElevatedButton(
@@ -1394,7 +1288,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                         wrongAnswers += 1;
                       });
                     },
-                    child: Text('Stage'),
+                    child: Text('Illuminator'),
                   ),
                   ElevatedButton(
                     onPressed: () {
@@ -1413,19 +1307,13 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                         wrongAnswers += 1;
                       });
                     },
-                    child: Text('Illuminator'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        wrongAnswers += 1;
-                      });
-                    },
                     child: Text('Eyepiece'),
                   ),
                 ],
               ),
             ),
+
+// Code for the objective lenses discussion
           if (showObjectiveDiscussion)
             Positioned(
               bottom: 150, // Adjusted to move above the buttons
@@ -1465,7 +1353,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                       Column(
                         children: [
                           Text(
-                            "They range from 4x to 100x magnification.",
+                            "They range from 4x to 100x and typically include 3 to 4 lenses.",
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.white,
@@ -1487,7 +1375,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                       Column(
                         children: [
                           Text(
-                            "The objective lenses are color-coded for different magnifications.",
+                            "The lenses are color-coded and screwed into the nosepiece.",
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.white,
@@ -1511,6 +1399,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                 ),
               ),
             ),
+          // Code for the nosepiece question
           if (showNosepieceQuestion)
             Positioned(
               bottom: 100,
@@ -1518,20 +1407,14 @@ class _ModuleScreenPage extends State<ModuleScreen> {
               right: 0,
               child: Column(
                 children: [
-                  Container(
-                    padding: EdgeInsets.all(16.0),
-                    decoration: BoxDecoration(
-                      color: Colors.black54,
-                      borderRadius: BorderRadius.circular(8.0),
+                  Text(
+                    "Can you answer this question?\nWhich part of the microscope is the nosepiece?",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                      backgroundColor: Colors.black54,
                     ),
-                    child: Text(
-                      "Can you answer this question?\nWhich part of the microscope is the nosepiece?",
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                    textAlign: TextAlign.center,
                   ),
                   SizedBox(height: 20),
                   ElevatedButton(
@@ -1540,7 +1423,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                         wrongAnswers += 1;
                       });
                     },
-                    child: Text('Objective Lens'),
+                    child: Text('Stage'),
                   ),
                   ElevatedButton(
                     onPressed: () {
@@ -1559,19 +1442,13 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                         wrongAnswers += 1;
                       });
                     },
-                    child: Text('Stage'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        wrongAnswers += 1;
-                      });
-                    },
                     child: Text('Illuminator'),
                   ),
                 ],
               ),
             ),
+
+// Code for the nosepiece discussion
           if (showNosepieceDiscussion)
             Positioned(
               bottom: 150, // Adjusted to move above the buttons
@@ -1589,7 +1466,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                       Column(
                         children: [
                           Text(
-                            "The nosepiece, also known as the revolving turret, holds the objective lenses.",
+                            "The nosepiece holds the objective lenses and allows you to switch between them.",
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.white,
@@ -1611,7 +1488,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                       Column(
                         children: [
                           Text(
-                            "It allows the user to rotate different objective lenses into position.",
+                            "It is located just above the stage and below the eyepiece.",
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.white,
@@ -1633,7 +1510,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                       Column(
                         children: [
                           Text(
-                            "The nosepiece ensures that each objective lens is correctly aligned with the eyepiece.",
+                            "Rotating the nosepiece changes the magnification power by switching the objective lenses.",
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.white,
@@ -1641,100 +1518,123 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                             textAlign: TextAlign.center,
                           ),
                           SizedBox(height: 20),
-                        ],
-                      ),
-                  ],
-                ),
-              ),
-            ),
-          // Positioning the buttons at the bottom
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              color: Colors.black54,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    for (int i = 0; i < 10; i++)
-                      Column(
-                        children: [
                           ElevatedButton(
-                            onPressed: unlockedButtons[i]
-                                ? () {
-                                    // Handle button press
-                                  }
-                                : null,
-                            style: ElevatedButton.styleFrom(
-                              shape: CircleBorder(),
-                              padding: EdgeInsets.all(20),
-                              backgroundColor: unlockedButtons[i]
-                                  ? Colors.green
-                                  : Colors.grey, // Background color
-                            ),
-                            child: unlockedButtons[i]
-                                ? Image.asset(
-                                    'assets/lesson1&2/assets/${[
-                                      'base',
-                                      'fine',
-                                      'coarse',
-                                      'arm',
-                                      'eye',
-                                      'lamp',
-                                      'diaphragm',
-                                      'stage',
-                                      'objective',
-                                      'nose'
-                                    ][i]}/${[
-                                      'base',
-                                      'fine',
-                                      'coarse',
-                                      'arm',
-                                      'eye',
-                                      'lamp',
-                                      'diaphragm',
-                                      'stage',
-                                      'objective',
-                                      'nose'
-                                    ][i]}.png',
-                                    width: 40,
-                                    height: 40,
-                                  )
-                                : Icon(
-                                    Icons.lock,
-                                    color: Colors.white,
-                                    size: 40,
-                                  ),
+                            onPressed: () {
+                              setState(() {
+                                nosepieceDiscussionStep += 1;
+                                showNosepieceDiscussion = false;
+                                // End of the process
+                              });
+                            },
+                            child: Text('Finish'),
                           ),
-                          if (unlockedButtons[i])
-                            Text(
-                              [
-                                'Base',
-                                'Fine Focus',
-                                'Coarse Focus',
-                                'Arm',
-                                'Eyepiece',
-                                'Illuminator',
-                                'Diaphragm',
-                                'Stage',
-                                'Objective',
-                                'Nosepiece'
-                              ][i],
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                              ),
-                            ),
                         ],
                       ),
                   ],
                 ),
               ),
             ),
-          ),
+          if (showNewModel ||
+              showBaseDiscussion ||
+              showFineFocusQuestion ||
+              showCoarseFocusDiscussion ||
+              showCoarseFocusQuestion ||
+              showArmQuestion ||
+              showEyepieceDiscussion ||
+              showEyepieceQuestion ||
+              showIlluminatorQuestion ||
+              showDiaphragmQuestion ||
+              showDiaphragmDiscussion ||
+              showStageQuestion ||
+              showStageDiscussion ||
+              showObjectiveQuestion ||
+              showObjectiveDiscussion ||
+              showNosepieceQuestion ||
+              showNosepieceDiscussion)
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                color: Colors.black54,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: List.generate(10, (index) {
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            ElevatedButton(
+                              onPressed: unlockedButtons[index]
+                                  ? () {
+                                      // Handle button press
+                                    }
+                                  : null,
+                              style: ElevatedButton.styleFrom(
+                                shape: CircleBorder(),
+                                padding: EdgeInsets.all(10),
+                              ),
+                              child: unlockedButtons[index]
+                                  ? Image.asset(
+                                      index == 0
+                                          ? 'assets/lesson1&2/assets/base/base.png'
+                                          : index == 1
+                                              ? 'assets/lesson1&2/assets/fine/fine.png'
+                                              : index == 2
+                                                  ? 'assets/lesson1&2/assets/coarse/coarse.png'
+                                                  : index == 3
+                                                      ? 'assets/lesson1&2/assets/arm/arm.png'
+                                                      : index == 4
+                                                          ? 'assets/lesson1&2/assets/eye/eye.png'
+                                                          : index == 5
+                                                              ? 'assets/lesson1&2/assets/lamp/illuminator.png'
+                                                              : index == 6
+                                                                  ? 'assets/lesson1&2/assets/diaphragm/diaphragm.png'
+                                                                  : index == 7
+                                                                      ? 'assets/lesson1&2/assets/stage/stage.png'
+                                                                      : index ==
+                                                                              8
+                                                                          ? 'assets/lesson1&2/assets/objective/objective.png'
+                                                                          : 'assets/lesson1&2/assets/nose/nose.png', // Path to the respective images
+                                      fit: BoxFit.cover,
+                                      width: 40,
+                                      height: 40,
+                                    )
+                                  : Icon(Icons.help_outline,
+                                      size: 40), // "?" icon
+                            ),
+                            if (unlockedButtons[index])
+                              Text(
+                                index == 0
+                                    ? 'Base'
+                                    : index == 1
+                                        ? 'Fine Focus'
+                                        : index == 2
+                                            ? 'Coarse Focus'
+                                            : index == 3
+                                                ? 'Arm'
+                                                : index == 4
+                                                    ? 'Eyepiece'
+                                                    : index == 5
+                                                        ? 'Illuminator'
+                                                        : index == 6
+                                                            ? 'Diaphragm'
+                                                            : index == 7
+                                                                ? 'Stage'
+                                                                : index == 8
+                                                                    ? 'Objective'
+                                                                    : 'Nosepiece',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                          ],
+                        ),
+                      );
+                    }),
+                  ),
+                ),
+              ),
+            ),
           Positioned(
             top: 40,
             left: 20,
@@ -1813,15 +1713,16 @@ class _ModuleScreenPage extends State<ModuleScreen> {
         if (singleHitTestResult != null) {
           print("Hit test result found: $singleHitTestResult");
           // Extract the translation and rotation from the hit test result
-          var translation =
-              singleHitTestResult.worldTransform!.getTranslation();
-          var rotation = singleHitTestResult.worldTransform!.getRotation();
+          var translation = singleHitTestResult.worldTransform.getTranslation();
+          var rotation = singleHitTestResult.worldTransform.getRotation();
           var rotationQuaternion = vector.Quaternion.fromRotation(rotation);
 
           // Create and add a 3D node at the tap location
           var newNode = ARNode(
             type: NodeType.localGLTF2,
-            uri: "assets/lesson1&2/assets/lens/lens.gltf",
+            uri: showNewModel
+                ? "assets/lesson1&2/assets/lenses/4x/4x.gltf"
+                : "assets/lesson1&2/assets/lens/lens.gltf",
             scale: vector.Vector3(0.1, 0.1, 0.1),
             position: translation,
             rotation: vector.Vector4(
@@ -1863,5 +1764,35 @@ class _ModuleScreenPage extends State<ModuleScreen> {
         }
       }
     };
+  }
+}
+
+class InstructionsDialog extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: SingleChildScrollView(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Instructions: Move your camera until white dots appear on the screen. These dots indicate detected surfaces. Once a surface is detected, tap on it to start.',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
+            Align(
+              alignment: Alignment.center,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Close'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
