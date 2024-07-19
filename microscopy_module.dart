@@ -53,6 +53,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
   bool showObjectiveDiscussion = false;
   bool showNosepieceQuestion = false;
   bool showNosepieceDiscussion = false;
+  bool showFinishMessage = false;
   int baseDiscussionStep = 0;
   int fineFocusDiscussionStep = 0;
   int coarseFocusDiscussionStep = 0;
@@ -1447,7 +1448,6 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                 ],
               ),
             ),
-
 // Code for the nosepiece discussion
           if (showNosepieceDiscussion)
             Positioned(
@@ -1523,7 +1523,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                               setState(() {
                                 nosepieceDiscussionStep += 1;
                                 showNosepieceDiscussion = false;
-                                // End of the process
+                                showFinishMessage = true;
                               });
                             },
                             child: Text('Finish'),
@@ -1534,6 +1534,51 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                 ),
               ),
             ),
+
+// Code for the finish message and transition to round 2
+          if (showFinishMessage)
+            Center(
+              child: Container(
+                padding: EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  color: Colors.black54,
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      "Great job! You managed to unlock all the microscope parts!",
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.white,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 20),
+                    Text(
+                      "However, we still have a problem. We need to assemble it! Are you ready?",
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.white,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          showFinishMessage = false;
+                          // Logic for starting round 2
+                        });
+                      },
+                      child: Text('Proceed to Round 2'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
           if (showNewModel ||
               showBaseDiscussion ||
               showFineFocusQuestion ||
@@ -1635,6 +1680,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                 ),
               ),
             ),
+
           Positioned(
             top: 40,
             left: 20,
@@ -1670,6 +1716,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
     );
   }
 
+//FOR AR. FIRST TAP ON THE SCREEN!
   void onARViewCreated(
     ARSessionManager arSessionManager,
     ARObjectManager arObjectManager,
@@ -1720,9 +1767,7 @@ class _ModuleScreenPage extends State<ModuleScreen> {
           // Create and add a 3D node at the tap location
           var newNode = ARNode(
             type: NodeType.localGLTF2,
-            uri: showNewModel
-                ? "assets/lesson1&2/assets/lenses/4x/4x.gltf"
-                : "assets/lesson1&2/assets/lens/lens.gltf",
+            uri: "assets/lesson1&2/assets/lens/lens.gltf",
             scale: vector.Vector3(0.1, 0.1, 0.1),
             position: translation,
             rotation: vector.Vector4(
@@ -1766,6 +1811,8 @@ class _ModuleScreenPage extends State<ModuleScreen> {
     };
   }
 }
+
+//END OF AR 3D MODELS
 
 class InstructionsDialog extends StatelessWidget {
   @override
