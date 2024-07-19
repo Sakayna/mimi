@@ -1717,100 +1717,100 @@ class _ModuleScreenPage extends State<ModuleScreen> {
   }
 
 //FOR AR. FIRST TAP ON THE SCREEN!
-  void onARViewCreated(
-    ARSessionManager arSessionManager,
-    ARObjectManager arObjectManager,
-    ARAnchorManager arAnchorManager,
-    ARLocationManager arLocationManager,
-  ) {
-    this.arSessionManager = arSessionManager;
-    this.arObjectManager = arObjectManager;
-    this.arAnchorManager = arAnchorManager;
-    this.arLocationManager = arLocationManager;
+// AR Tap Handling Code
+void onARViewCreated(
+  ARSessionManager arSessionManager,
+  ARObjectManager arObjectManager,
+  ARAnchorManager arAnchorManager,
+  ARLocationManager arLocationManager,
+) {
+  this.arSessionManager = arSessionManager;
+  this.arObjectManager = arObjectManager;
+  this.arAnchorManager = arAnchorManager;
+  this.arLocationManager = arLocationManager;
 
-    print("ARView created");
+  print("ARView created");
 
-    this.arSessionManager!.onInitialize(
-          showFeaturePoints: true,
-          showPlanes: true,
-          showWorldOrigin: false,
-          handlePans: false,
-          handleScale: false,
+  this.arSessionManager!.onInitialize(
+    showFeaturePoints: true,
+    showPlanes: true,
+    showWorldOrigin: false,
+    handlePans: false,
+    handleScale: false,
+  );
+  this.arObjectManager!.onInitialize();
+
+  this.arSessionManager!.onPlaneOrPointTap = (List<ARHitTestResult> hitTestResults) {
+    print("Plane or point tapped");
+
+    if (!surfaceDetected) {
+      setState(() {
+        surfaceDetected = true;
+      });
+    } else if (!modelPlaced) {
+      ARHitTestResult? singleHitTestResult;
+      try {
+        singleHitTestResult = hitTestResults.firstWhere(
+          (hitTestResult) => hitTestResult.type == ARHitTestResultType.plane,
         );
-    this.arObjectManager!.onInitialize();
-
-    this.arSessionManager!.onPlaneOrPointTap =
-        (List<ARHitTestResult> hitTestResults) {
-      print("Plane or point tapped");
-
-      if (!surfaceDetected) {
-        setState(() {
-          surfaceDetected = true;
-        });
-      } else if (!modelPlaced) {
-        ARHitTestResult? singleHitTestResult;
-        try {
-          singleHitTestResult = hitTestResults.firstWhere(
-            (hitTestResult) => hitTestResult.type == ARHitTestResultType.plane,
-          );
-        } catch (e) {
-          singleHitTestResult = null;
-        }
-
-        if (singleHitTestResult != null) {
-          print("Hit test result found: $singleHitTestResult");
-          // Extract the translation and rotation from the hit test result
-          var translation = singleHitTestResult.worldTransform.getTranslation();
-          var rotation = singleHitTestResult.worldTransform.getRotation();
-          var rotationQuaternion = vector.Quaternion.fromRotation(rotation);
-
-          // Create and add a 3D node at the tap location
-          var newNode = ARNode(
-            type: NodeType.localGLTF2,
-            uri: "assets/lesson1&2/assets/lens/lens.gltf",
-            scale: vector.Vector3(0.1, 0.1, 0.1),
-            position: translation,
-            rotation: vector.Vector4(
-              rotationQuaternion.x,
-              rotationQuaternion.y,
-              rotationQuaternion.z,
-              rotationQuaternion.w,
-            ),
-          );
-
-          print("Adding 3D node: $newNode");
-
-          arObjectManager.addNode(newNode).then((didAddNode) {
-            if (didAddNode!) {
-              print("3D model added to the scene.");
-              setState(() {
-                modelPlaced = true;
-                placedNode = newNode;
-                // Turn off plane detection when the model is placed
-                if (arSessionManager != null) {
-                  arSessionManager!.onInitialize(
-                    showFeaturePoints: false,
-                    showPlanes: false,
-                    showWorldOrigin: false,
-                    handlePans: false,
-                    handleScale: false,
-                  );
-                }
-              });
-            } else {
-              arSessionManager.onError("Failed to add 3D model.");
-            }
-          }).catchError((error) {
-            print("Error adding 3D node: $error");
-            arSessionManager.onError("Failed to add 3D model: $error");
-          });
-        } else {
-          print("No hit test result found.");
-        }
+      } catch (e) {
+        singleHitTestResult = null;
       }
-    };
-  }
+
+      if (singleHitTestResult != null) {
+        print("Hit test result found: $singleHitTestResult");
+        // Extract the translation and rotation from the hit test result
+        var translation = singleHitTestResult.worldTransform.getTranslation();
+        var rotation = singleHitTestResult.worldTransform.getRotation();
+        var rotationQuaternion = vector.Quaternion.fromRotation(rotation);
+
+        // Create and add a 3D node at the tap location
+        var newNode = ARNode(
+          type: NodeType.localGLTF2,
+          uri: "assets/hologram/microscope1.gltf",
+          scale: vector.Vector3(0.1, 0.1, 0.1),
+          position: translation,
+          rotation: vector.Vector4(
+            rotationQuaternion.x,
+            rotationQuaternion.y,
+            rotationQuaternion.z,
+            rotationQuaternion.w,
+          ),
+        );
+
+        print("Adding 3D node: $newNode");
+
+        arObjectManager.addNode(newNode).then((didAddNode) {
+          if (didAddNode!) {
+            print("3D model added to the scene.");
+            setState(() {
+              modelPlaced = true;
+              placedNode = newNode;
+              // Turn off plane detection when the model is placed
+              if (arSessionManager != null) {
+                arSessionManager!.onInitialize(
+                  showFeaturePoints: false,
+                  showPlanes: false,
+                  showWorldOrigin: false,
+                  handlePans: false,
+                  handleScale: false,
+                );
+              }
+            });
+          } else {
+            arSessionManager.onError("Failed to add 3D model.");
+          }
+        }).catchError((error) {
+          print("Error adding 3D node: $error");
+          arSessionManager.onError("Failed to add 3D model: $error");
+        });
+      } else {
+        print("No hit test result found.");
+      }
+    }
+  };
 }
+
 
 //END OF AR 3D MODELS
 
