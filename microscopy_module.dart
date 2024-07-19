@@ -102,65 +102,49 @@ class _ModuleScreenPage extends State<ModuleScreen> {
             onARViewCreated: onARViewCreated,
             planeDetectionConfig: PlaneDetectionConfig.horizontalAndVertical,
           ),
-          if (!surfaceDetected || !modelPlaced)
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  if (!surfaceDetected)
-                    Column(
-                      children: [
-                        Icon(Icons.camera, size: 100, color: Colors.white),
-                        SizedBox(height: 20),
-                        Text(
-                          'Scan the surface and tap to start',
-                          style: TextStyle(
-                            fontSize: 24,
-                            color: Colors.white,
-                            backgroundColor: Colors.black54,
-                          ),
-                          textAlign: TextAlign.center,
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                if (!surfaceDetected)
+                  Column(
+                    children: [
+                      Icon(Icons.camera, size: 100, color: Colors.white),
+                      SizedBox(height: 20),
+                      Text(
+                        'Scan the surface and tap to start',
+                        style: TextStyle(
+                          fontSize: 24,
+                          color: Colors.white,
+                          backgroundColor: Colors.black54,
                         ),
-                      ],
-                    ),
-                  if (surfaceDetected && !modelPlaced)
-                    Column(
-                      children: [
-                        Icon(Icons.touch_app, size: 100, color: Colors.white),
-                        SizedBox(height: 20),
-                        Text(
-                          'Tap the screen to place the model',
-                          style: TextStyle(
-                            fontSize: 24,
-                            color: Colors.white,
-                            backgroundColor: Colors.black54,
-                          ),
-                          textAlign: TextAlign.center,
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                if (surfaceDetected && !modelPlaced)
+                  Column(
+                    children: [
+                      Icon(Icons.touch_app, size: 100, color: Colors.white),
+                      SizedBox(height: 20),
+                      Text(
+                        'Tap the screen to place the model',
+                        style: TextStyle(
+                          fontSize: 24,
+                          color: Colors.white,
+                          backgroundColor: Colors.black54,
                         ),
-                      ],
-                    ),
-                ],
-              ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+              ],
             ),
+          ),
           if (modelPlaced &&
               !showQuestion &&
-              !showNewModel &&
-              !showFineFocusQuestion &&
-              !showBaseDiscussion &&
-              !showCoarseFocusDiscussion &&
-              !showCoarseFocusQuestion &&
-              !showArmQuestion &&
-              !showEyepieceDiscussion &&
-              !showEyepieceQuestion &&
-              !showIlluminatorQuestion &&
-              !showDiaphragmQuestion &&
-              !showDiaphragmDiscussion &&
-              !showStageQuestion &&
-              !showStageDiscussion &&
-              !showObjectiveQuestion &&
-              !showObjectiveDiscussion &&
-              !showNosepieceQuestion &&
-              !showNosepieceDiscussion)
+              !showSuccessMessage &&
+              !showNewModel)
             Positioned(
               bottom: 100,
               left: 0,
@@ -1682,7 +1666,6 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                 ),
               ),
             ),
-
           Positioned(
             top: 40,
             left: 20,
@@ -1718,8 +1701,6 @@ class _ModuleScreenPage extends State<ModuleScreen> {
     );
   }
 
-//FOR AR. FIRST TAP ON THE SCREEN!
-
   void onARViewCreated(
     ARSessionManager arSessionManager,
     ARObjectManager arObjectManager,
@@ -1746,7 +1727,11 @@ class _ModuleScreenPage extends State<ModuleScreen> {
         (List<ARHitTestResult> hitTestResults) {
       print("Plane or point tapped");
 
-      if (!modelPlaced) {
+      if (!surfaceDetected) {
+        setState(() {
+          surfaceDetected = true;
+        });
+      } else if (!modelPlaced) {
         ARHitTestResult? singleHitTestResult;
         try {
           singleHitTestResult = hitTestResults.firstWhere(
@@ -1766,7 +1751,9 @@ class _ModuleScreenPage extends State<ModuleScreen> {
           // Create and add a 3D node at the tap location
           var newNode = ARNode(
             type: NodeType.localGLTF2,
-            uri: "assets/hologram/microscope1.gltf",
+            uri: showNewModel
+                ? "assets/lesson1&2/assets/lenses/4x/4x.gltf"
+                : "assets/lesson1&2/assets/lens/lens.gltf",
             scale: vector.Vector3(0.1, 0.1, 0.1),
             position: translation,
             rotation: vector.Vector4(
@@ -1786,13 +1773,15 @@ class _ModuleScreenPage extends State<ModuleScreen> {
                 modelPlaced = true;
                 placedNode = newNode;
                 // Turn off plane detection when the model is placed
-                arSessionManager!.onInitialize(
-                  showFeaturePoints: false,
-                  showPlanes: false,
-                  showWorldOrigin: false,
-                  handlePans: false,
-                  handleScale: false,
-                );
+                if (arSessionManager != null) {
+                  arSessionManager!.onInitialize(
+                    showFeaturePoints: false,
+                    showPlanes: false,
+                    showWorldOrigin: false,
+                    handlePans: false,
+                    handleScale: false,
+                  );
+                }
               });
             } else {
               arSessionManager.onError("Failed to add 3D model.");
@@ -1804,8 +1793,6 @@ class _ModuleScreenPage extends State<ModuleScreen> {
         } else {
           print("No hit test result found.");
         }
-      } else {
-        print("Model already placed, ignoring tap.");
       }
     };
   }
